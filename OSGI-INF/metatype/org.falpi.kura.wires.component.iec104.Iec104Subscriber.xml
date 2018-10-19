@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MetaData xmlns="http://www.osgi.org/xmlns/metatype/v1.2.0" localization="en_us">
+	<OCD id="org.falpi.kura.wires.component.iec104.Iec104Subscriber"
+		name="IEC-104 Subscriber"
+		description="IEC-104 Subscriber Wire Component">
+		
+		<AD
+			id="iec104.enabled"
+			name="iec104.enabled"
+			type="Boolean"
+			cardinality="1"
+			required="true"
+			default="false"
+			description="Enable connection">
+		</AD>
+		
+		<AD id="iec104.host"
+			name="iec104.host"
+			type="String"
+			cardinality="0"
+			required="true"
+			default="127.0.0.1"
+			description="Host for IEC-104 Server">
+		</AD>
+
+		<AD id="iec104.port"
+			name="iec104.port"
+			type="Integer"
+			cardinality="0"
+			required="true"
+			default="2404"
+			description="Port for IEC-104 Server">
+		</AD>
+		
+		<AD id="iec104.common-addr"
+			name="iec104.common-addr"
+			type="Integer"
+			cardinality="0"
+			required="true"
+			default="0"
+			description="Common Address for IEC-104 Server">
+		</AD>
+		
+        <AD id="iec104.delay"
+			name="iec104.delay"
+			type="Integer"
+			cardinality="0"
+			required="true"
+			default="5"
+			min="1"
+			max="60"
+			description="Reconnect delay (seconds , min=1 , max=60)">
+		</AD>
+		
+        <AD id="iec104.genint"
+			name="iec104.genint"
+			type="Boolean"
+			cardinality="1"
+			required="true"
+			default="false"
+			description="General interrogation after connect">
+		</AD>
+		
+        <AD
+			id="iec104.info-alert"
+			name="iec104.info-alert"
+			type="Boolean"
+			cardinality="1"
+			required="true"
+			default="true"
+			description="Enable information alerts">
+		</AD>	
+		
+        <AD
+			id="iec104.error-alert"
+			name="iec104.error-alert"
+			type="Boolean"
+			cardinality="1"
+			required="true"
+			default="true"
+			description="Enable malfunction alerts">
+		</AD>
+		
+	</OCD>
+	
+	<Designate pid="org.falpi.kura.wires.component.iec104.Iec104Subscriber" factoryPid="org.falpi.kura.wires.component.iec104.Iec104Subscriber">
+		<Object ocdref="org.falpi.kura.wires.component.iec104.Iec104Subscriber"/>
+	</Designate>
+</MetaData>

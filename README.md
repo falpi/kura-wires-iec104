@@ -1,7 +1,7 @@
-# Eclipse Kura™ Wire Subscriber for IEC 608070-5-104
+# Eclipse Kura™ Wire Subscriber for IEC 608070-5-104 Protocol
 An Eclipse Kura Wires component to subscribe with a IEC 60870-5-104 Server.
 It uses J60870 library for IEC protocol stack implementation.
-It is tested with Eclipse Kura 3.2.0 for the moment.
+Tested with Eclipse Kura 3.2.0.
 
 ## Pre-requisites
 You will need the following pre-requisites in order compile and use these examples:
@@ -10,5 +10,5 @@ You will need the following pre-requisites in order compile and use these exampl
  1. A Eclipse Kura capable device or simulator
  
 ## Binary package
-The binary package ready for the installation could be
+The binary package ready for the installation can be
 found in folder "resources/dp".

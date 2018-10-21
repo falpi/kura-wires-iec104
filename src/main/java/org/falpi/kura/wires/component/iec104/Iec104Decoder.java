@@ -7,6 +7,7 @@ import java.util.Map;
 import org.eclipse.kura.type.TypedValue;
 import org.eclipse.kura.type.TypedValues;
 
+import org.openmuc.j60870.IeCauseOfInitialization;
 import org.openmuc.j60870.IeQualifierOfInterrogation;
 import org.openmuc.j60870.IeSinglePointWithQuality;
 import org.openmuc.j60870.IeDoublePointWithQuality;
@@ -93,6 +94,11 @@ public class Iec104Decoder {
 	        	IntQuality = decodeQuality(ObjQuality);   
 	        	StrTimestamp = decodeTime56(ObjTime56);
 	            break;
+	            
+	         // 70
+	        case M_EI_NA_1:
+	        	ObjValue = (Integer)((IeCauseOfInitialization)ObjElementSet[0]).getValue();
+	        	break;    
 	            
 	        // 100
 	        case C_IC_NA_1:

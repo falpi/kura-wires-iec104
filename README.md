@@ -8,13 +8,13 @@ For the moment the following ASDU types are decoded:
 
 ASDU TypeID     | Description
 --------------- | ----------------------------------------------------------  
-**M_SP_NA_1** (001) | Single-point information without time tag  
-**M_SP_TA_1** (002) | Single-point information with time tag  
-**M_DP_NA_1** (003) | Double-point information without time tag  
-**M_DP_TA_1** (004) | Double-point information with time tag  
-**M_ME_NA_1** (009) | Measured value, normalized value  
-**M_ME_TD_1** (034) | Measured value, normalized value with time tag CP56Time2a  
-**M_EI_NA_1** (070) | End of initialization  
+**M_SP_NA_1** (1) | Single-point information without time tag  
+**M_SP_TA_1** (2) | Single-point information with time tag  
+**M_DP_NA_1** (3) | Double-point information without time tag  
+**M_DP_TA_1** (4) | Double-point information with time tag  
+**M_ME_NA_1** (9) | Measured value, normalized value  
+**M_ME_TD_1** (34) | Measured value, normalized value with time tag CP56Time2a  
+**M_EI_NA_1** (70) | End of initialization  
 **C_IC_NA_1** (100) | Interrogation command  
  
 Send me an e-mail to add other types or join to development.  

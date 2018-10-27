@@ -14,6 +14,15 @@
 			description="Enable connection">
 		</AD>
 		
+		<AD id="iec104.device-id"
+			name="iec104.device-id"
+			type="String"
+			cardinality="0"
+			required="true"
+			default="myDeviceId"
+			description="Device Identifier Tag">
+		</AD>
+		
 		<AD id="iec104.host"
 			name="iec104.host"
 			type="String"
@@ -79,6 +88,21 @@
 			required="true"
 			default="true"
 			description="Enable malfunction alerts">
+		</AD>
+		
+        <AD
+			id="iec104.enrichment"
+			name="iec104.enrichment"
+			type="String"
+			cardinality="1"
+			required="false"
+			default="&lt;items&gt;&#10;
+     &lt;!-- ============================================================================================================== --&gt;&#10;
+     &lt;!-- Add zero more &quot;item&quot;elements to add metrics to each ASDU message identified by &quot;IOA&quot;. Each metric is given as additional attribute/value pair.        --&gt;&#10;
+     &lt;!-- The following attribute names are reserved because already mapped for ASDU messages:  id | host | port | type | test | cot | oa | ca | val | qual | time    --&gt;&#10;
+     &lt;!--    &lt;item ioa=&quot;&lt;integer&gt;&quot; &lt;metricName1&gt;=&quot;&lt;metricValue1&gt;&quot; &lt;metricName2&gt;=&quot;&lt;metricValue2&gt;&quot; ... &lt;metricNameN&gt;=&quot;&lt;metricValueN&gt;&quot; /&gt;                      --&gt;&#10;
+     &lt;!-- ============================================================================================================== --&gt;&#10;&lt;/items&gt;"
+			description="XML configuration for messages enrichment|TextArea">
 		</AD>
 		
 	</OCD>

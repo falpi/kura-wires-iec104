@@ -110,9 +110,9 @@ public class Iec104Decoder {
 	     }
         
         // Aggiorna i valori in uscita        
-       	ObjValues.replace("val", TypedValues.newTypedValue(ObjValue));
-        ObjValues.replace("qual", TypedValues.newIntegerValue(IntQuality));
-    	ObjValues.replace("time", TypedValues.newStringValue(StrTimestamp));
+       	ObjValues.put("val", TypedValues.newTypedValue(ObjValue));
+        ObjValues.put("qual", TypedValues.newIntegerValue(IntQuality));
+    	ObjValues.put("time", TypedValues.newStringValue(StrTimestamp));
     }	
 		
 	// Decodifica valore singlepoint

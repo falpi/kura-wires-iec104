@@ -3,7 +3,7 @@ package org.falpi.kura.wires.component.iec104;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
@@ -20,7 +20,6 @@ import org.eclipse.kura.wire.WireEmitter;
 import org.eclipse.kura.wire.WireHelperService;
 import org.eclipse.kura.wire.WireRecord;
 import org.eclipse.kura.wire.WireSupport;
-
 import org.osgi.service.wireadmin.Wire;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -284,7 +283,8 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
 			((AlertId==Alert.ERROR_ALERT)&&(this.actualConfiguration.ErrorAlert))) {
 			
 	     	// Prepara le proprietà dell'evento
-	    	ObjWireValues = new LinkedHashMap<>();			
+	    	ObjWireValues = new HashMap<>();			
+	    	ObjWireValues.put("id", TypedValues.newStringValue(this.actualConfiguration.DeviceId));
 	    	ObjWireValues.put("host", TypedValues.newStringValue(this.actualConfiguration.Host));
 	    	ObjWireValues.put("port", TypedValues.newIntegerValue(this.actualConfiguration.Port));
 	    	ObjWireValues.put("type", TypedValues.newStringValue("ALERT"));    	
@@ -358,6 +358,7 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
     public void newASdu(ASdu ObjASDU) {
     	
     	// Variabili locali
+    	int IntIOA;
     	List<WireRecord> ObjWireRecords;
     	Map<String, TypedValue<?>> ObjWireValues;
     	InformationObject[] ObjInformationObjects;	
@@ -375,8 +376,9 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
     	}
 		
     	// Prepara le proprietà di testata dell'ASDU
-    	ObjWireValues = new LinkedHashMap<>();			
+    	ObjWireValues = new HashMap<>();	
     	
+    	ObjWireValues.put("id", TypedValues.newStringValue(this.actualConfiguration.DeviceId));
     	ObjWireValues.put("host", TypedValues.newStringValue(this.actualConfiguration.Host));
     	ObjWireValues.put("port", TypedValues.newIntegerValue(this.actualConfiguration.Port));
 		ObjWireValues.put("type", TypedValues.newStringValue(ObjASDU.getTypeIdentification().name()));
@@ -384,10 +386,6 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
 		ObjWireValues.put("cot", TypedValues.newStringValue(ObjASDU.getCauseOfTransmission().name()));
 		ObjWireValues.put("oa", TypedValues.newIntegerValue(ObjASDU.getOriginatorAddress()));
 		ObjWireValues.put("ca", TypedValues.newIntegerValue(ObjASDU.getCommonAddress()));
-		ObjWireValues.put("ioa", null);
-		ObjWireValues.put("val", null);
-		ObjWireValues.put("qual", null);
-		ObjWireValues.put("time", null);		
 		
 		// Crea un wirerecord per ciascun oggetto
 		ObjWireRecords = new ArrayList<>();
@@ -396,8 +394,14 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
 		for (InformationObject ObjInformationObject : ObjInformationObjects) {
 			
 			// Aggiorna lo IOA condiviso da tutti gli information element
-			ObjWireValues.replace("ioa", TypedValues.newIntegerValue(ObjInformationObject.getInformationObjectAddress()));
+			IntIOA = ObjInformationObject.getInformationObjectAddress();
+			ObjWireValues.put("ioa", TypedValues.newIntegerValue(IntIOA));
 			
+			// Se esiste un enrichment per l'IOA aggiunge le metriche definite
+			if (this.actualConfiguration.Enrichment.containsKey(IntIOA)) {
+				ObjWireValues.putAll((Map<String, TypedValue<?>>)this.actualConfiguration.Enrichment.get(IntIOA));	
+			}		    	
+
 			// Ciclo di scansione di tutti gli information element
 			for (InformationElement[] ObjInformationElementSet : ObjInformationObject.getInformationElements()) {
                 
@@ -409,7 +413,7 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
 				catch (Exception e) {					
 					notifyAlert(Alert.ERROR_ALERT,"Received ASDU cannot be decoded. Reason: "+e.getMessage());
 				}				
-            }			
+            }		
 		}
 		
 		// Trasmette i wirerecord ai receiver

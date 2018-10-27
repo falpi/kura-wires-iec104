@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"            
+            elementFormDefault="unqualified" 
+			   attributeFormDefault="unqualified">
+                
+   <xsd:element name="items">      
+      <xsd:complexType>
+         <xsd:sequence>
+			   <xsd:element name="item" minOccurs="0" maxOccurs="unbounded">
+               <xsd:complexType>
+                  <xsd:attribute name="ioa" use="required" type="xsd:nonNegativeInteger"/>
+                  <xsd:attribute name="id" use="prohibited"/>
+                  <xsd:attribute name="host" use="prohibited"/>
+                  <xsd:attribute name="port" use="prohibited"/>
+                  <xsd:attribute name="type" use="prohibited"/>
+                  <xsd:attribute name="test" use="prohibited"/>
+                  <xsd:attribute name="cot" use="prohibited"/>
+                  <xsd:attribute name="oa" use="prohibited"/>
+                  <xsd:attribute name="ca" use="prohibited"/>
+                  <xsd:attribute name="val" use="prohibited"/>
+                  <xsd:attribute name="qual" use="prohibited"/>
+                  <xsd:attribute name="time" use="prohibited"/>
+                  <xsd:anyAttribute processContents="skip" />
+               </xsd:complexType>
+            </xsd:element>
+         </xsd:sequence>
+      </xsd:complexType>
+      <xsd:unique name="ukIOA">
+          <xsd:selector xpath="item"/>
+          <xsd:field xpath="@ioa"/>
+      </xsd:unique>              
+   </xsd:element>
+            
+</xsd:schema>

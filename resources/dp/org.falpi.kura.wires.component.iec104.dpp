@@ -1,15 +1,15 @@
 #Deployment Plugin Project File
-#Fri Oct 26 12:44:44 CEST 2018
+#Sun Oct 28 17:33:20 CET 2018
 build.ant.name=<.>\\resources\\dp\\org.falpi.kura.wires.component.iec104_build.xml
 build.dp.file=<.>\\resources\\dp\\org.falpi.kura.wires.component.iec104.dp
 build.location=
-bundles.0.bundle_path=<.>\\resources\\plugins\\org.falpi.kura.wires.component.iec104_1.1.0.jar
+bundles.0.bundle_path=<.>\\resources\\plugins\\org.falpi.kura.wires.component.iec104_1.2.0.jar
 bundles.0.customizer=false
 bundles.0.headers.count=0
 bundles.0.missing=false
-bundles.0.name=bundles/org.falpi.kura.wires.component.iec104_1.1.0.jar
+bundles.0.name=bundles/org.falpi.kura.wires.component.iec104_1.2.0.jar
 bundles.0.symbolic_name=org.falpi.kura.wires.component.iec104
-bundles.0.version=1.1.0
+bundles.0.version=1.2.0
 bundles.1.bundle_path=<.>\\resources\\plugins\\org.apache.servicemix.bundles.xmlbeans-2.6.0_2.jar
 bundles.1.customizer=false
 bundles.1.headers.count=0
@@ -22,6 +22,6 @@ certificates.count=0
 general.signbundles=false
 headers.other.headers=
 headers.symbolic.name=org.falpi.kura.wires.component.iec104
-headers.version=1.1.0
+headers.version=1.2.0
 resources.count=0
 

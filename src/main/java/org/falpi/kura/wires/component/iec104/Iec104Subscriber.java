@@ -287,8 +287,7 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
 	    	ObjWireValues.put("id", TypedValues.newStringValue(this.actualConfiguration.DeviceId));
 	    	ObjWireValues.put("host", TypedValues.newStringValue(this.actualConfiguration.Host));
 	    	ObjWireValues.put("port", TypedValues.newIntegerValue(this.actualConfiguration.Port));
-	    	ObjWireValues.put("type", TypedValues.newStringValue("ALERT"));    	
-			ObjWireValues.put("event", TypedValues.newStringValue(AlertId.description));
+	    	ObjWireValues.put("event", TypedValues.newStringValue(AlertId.description));
 			
 			// Se si tratta di alert di errore ed è stato fornito un messaggio lo aggiunge al record
 			if ((StrMessage!="")&&(AlertId==Alert.ERROR_ALERT)) {
@@ -381,6 +380,8 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
     	ObjWireValues.put("id", TypedValues.newStringValue(this.actualConfiguration.DeviceId));
     	ObjWireValues.put("host", TypedValues.newStringValue(this.actualConfiguration.Host));
     	ObjWireValues.put("port", TypedValues.newIntegerValue(this.actualConfiguration.Port));
+    	ObjWireValues.put("event", TypedValues.newStringValue("DATA"));
+		
 		ObjWireValues.put("type", TypedValues.newStringValue(ObjASDU.getTypeIdentification().name()));
 		ObjWireValues.put("test", TypedValues.newStringValue(ObjASDU.isTestFrame()?("y"):("n")));
 		ObjWireValues.put("cot", TypedValues.newStringValue(ObjASDU.getCauseOfTransmission().name()));

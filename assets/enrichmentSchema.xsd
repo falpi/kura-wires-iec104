@@ -3,15 +3,58 @@
             elementFormDefault="unqualified" 
 			   attributeFormDefault="unqualified">
                 
-   <xsd:element name="items">      
-      <xsd:complexType>
+   <xsd:element name="config">      
+      <xsd:complexType>      
+           
          <xsd:sequence>
-			   <xsd:element name="item" minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="alert" minOccurs="0" maxOccurs="1">
+               <xsd:complexType>
+                  <xsd:attribute name="ioa" use="prohibited"/>
+                  <xsd:attribute name="id" use="prohibited"/>
+                  <xsd:attribute name="host" use="prohibited"/>
+                  <xsd:attribute name="port" use="prohibited"/>
+                  <xsd:attribute name="event" use="prohibited"/>
+                  <xsd:attribute name="message" use="prohibited"/>
+                  <xsd:attribute name="type" use="prohibited"/>
+                  <xsd:attribute name="test" use="prohibited"/>
+                  <xsd:attribute name="cot" use="prohibited"/>
+                  <xsd:attribute name="oa" use="prohibited"/>
+                  <xsd:attribute name="ca" use="prohibited"/>
+                  <xsd:attribute name="val" use="prohibited"/>
+                  <xsd:attribute name="qual" use="prohibited"/>
+                  <xsd:attribute name="time" use="prohibited"/>
+                  <xsd:anyAttribute processContents="skip" />
+               </xsd:complexType>
+            </xsd:element>
+            
+            <xsd:element name="default" minOccurs="0" maxOccurs="1">
+               <xsd:complexType>
+                  <xsd:attribute name="ioa" use="prohibited"/>
+                  <xsd:attribute name="id" use="prohibited"/>
+                  <xsd:attribute name="host" use="prohibited"/>
+                  <xsd:attribute name="port" use="prohibited"/>
+                  <xsd:attribute name="event" use="prohibited"/>
+                  <xsd:attribute name="message" use="prohibited"/>
+                  <xsd:attribute name="type" use="prohibited"/>
+                  <xsd:attribute name="test" use="prohibited"/>
+                  <xsd:attribute name="cot" use="prohibited"/>
+                  <xsd:attribute name="oa" use="prohibited"/>
+                  <xsd:attribute name="ca" use="prohibited"/>
+                  <xsd:attribute name="val" use="prohibited"/>
+                  <xsd:attribute name="qual" use="prohibited"/>
+                  <xsd:attribute name="time" use="prohibited"/>
+                  <xsd:anyAttribute processContents="skip" />
+               </xsd:complexType>
+            </xsd:element>
+
+			   <xsd:element name="matching" minOccurs="0" maxOccurs="unbounded">
                <xsd:complexType>
                   <xsd:attribute name="ioa" use="required" type="xsd:nonNegativeInteger"/>
                   <xsd:attribute name="id" use="prohibited"/>
                   <xsd:attribute name="host" use="prohibited"/>
                   <xsd:attribute name="port" use="prohibited"/>
+                  <xsd:attribute name="event" use="prohibited"/>
+                  <xsd:attribute name="message" use="prohibited"/>
                   <xsd:attribute name="type" use="prohibited"/>
                   <xsd:attribute name="test" use="prohibited"/>
                   <xsd:attribute name="cot" use="prohibited"/>
@@ -24,11 +67,14 @@
                </xsd:complexType>
             </xsd:element>
          </xsd:sequence>
+         
       </xsd:complexType>
+      
       <xsd:unique name="ukIOA">
           <xsd:selector xpath="item"/>
           <xsd:field xpath="@ioa"/>
-      </xsd:unique>              
+      </xsd:unique>    
+      
    </xsd:element>
             
 </xsd:schema>

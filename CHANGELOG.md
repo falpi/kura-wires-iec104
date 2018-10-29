@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [1.2.0] - under development
 ### Changed
+- Enhanced enrichment. Now it's possible to configure enrichment for alert messages 
+  and a global default rule for enrichment of data messages that doesn't match any specified IOA.
+  See the default XML for enrichment configuration of component for syntax and example configuration.
+
 - Reorganize some metrics. 
   > Metric "event" is shared by all messages and define event type (DATA,CONNECT,DISCONNECT,ERROR)
   > Metric "message" is used only for alert events (<> DATA) and contains optional message.

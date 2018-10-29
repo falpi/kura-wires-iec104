@@ -294,6 +294,11 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
 				ObjWireValues.put("message", TypedValues.newStringValue(StrMessage));
 			}
 			
+			// Se c'è un enrichment per gli alert lo aggiunge
+			if (this.actualConfiguration.AlertEnrichment.size()>0) {
+				ObjWireValues.putAll(this.actualConfiguration.AlertEnrichment);
+			}
+			
 			ObjWireRecords = new ArrayList<>();
 	        ObjWireRecords.add(new WireRecord(ObjWireValues));   
 			
@@ -398,10 +403,12 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
 			IntIOA = ObjInformationObject.getInformationObjectAddress();
 			ObjWireValues.put("ioa", TypedValues.newIntegerValue(IntIOA));
 			
-			// Se esiste un enrichment per l'IOA aggiunge le metriche definite
-			if (this.actualConfiguration.Enrichment.containsKey(IntIOA)) {
-				ObjWireValues.putAll((Map<String, TypedValue<?>>)this.actualConfiguration.Enrichment.get(IntIOA));	
-			}		    	
+			// Se l'IOA matcha con regola di enrichment aggiunge metriche, altrimenti aggiunge quelle di default
+			if (this.actualConfiguration.MatchingEnrichment.containsKey(IntIOA)) {
+				ObjWireValues.putAll(this.actualConfiguration.MatchingEnrichment.get(IntIOA));	
+			} else if (this.actualConfiguration.DefaultEnrichment.size()>0) {
+				ObjWireValues.putAll(this.actualConfiguration.DefaultEnrichment);
+			}
 
 			// Ciclo di scansione di tutti gli information element
 			for (InformationElement[] ObjInformationElementSet : ObjInformationObject.getInformationElements()) {

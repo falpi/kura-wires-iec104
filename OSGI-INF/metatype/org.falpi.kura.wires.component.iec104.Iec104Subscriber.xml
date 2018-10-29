@@ -20,7 +20,7 @@
 			cardinality="0"
 			required="true"
 			default="myDeviceId"
-			description="Device Identifier Tag">
+			description="Device Identifier">
 		</AD>
 		
 		<AD id="iec104.host"
@@ -96,12 +96,20 @@
 			type="String"
 			cardinality="1"
 			required="false"
-			default="&lt;items&gt;&#10;
-     &lt;!-- ============================================================================================================== --&gt;&#10;
-     &lt;!-- Add zero more &quot;item&quot;elements to add metrics to each ASDU message identified by &quot;IOA&quot;. Each metric is given as additional attribute/value pair.        --&gt;&#10;
-     &lt;!-- The following attribute names are reserved because already mapped for ASDU messages:  id | host | port | type | test | cot | oa | ca | val | qual | time    --&gt;&#10;
-     &lt;!--    &lt;item ioa=&quot;&lt;integer&gt;&quot; &lt;metricName1&gt;=&quot;&lt;metricValue1&gt;&quot; &lt;metricName2&gt;=&quot;&lt;metricValue2&gt;&quot; ... &lt;metricNameN&gt;=&quot;&lt;metricValueN&gt;&quot; /&gt;                      --&gt;&#10;
-     &lt;!-- ============================================================================================================== --&gt;&#10;&lt;/items&gt;"
+			default="&lt;config&gt;&#10;
+      &lt;!-- ==================================================================================================================== --&gt;&#10;
+      &lt;!-- Enrichment configuration syntax :                                                                                                                                                                                                              --&gt;&#10;
+      &lt;!--    - For alert messages enrichment : add zero or exactly one &lt;alert&gt; element to add metrics to all ALERT messages                                                                      --&gt;&#10;
+      &lt;!--    - For default data messages enrichment : add zero or exactly one &lt;default&gt; element to add metrics to all DATA messages with unmatching IOA                    --&gt;&#10;
+      &lt;!--    - For specific data messages enrichment : add zero or more &lt;matching&gt; elements to add metrics to DATA message with matching IOA                                  --&gt;&#10;
+      &lt;!--    - Additional metrics are given as attribute/value pairs in XML elements. The following attribute names are reserved:                                                                     --&gt;&#10;
+      &lt;!--       id | host | port | event | message | type | test | cot | oa | ca | ioa | val | qual | time                                                                                                                               --&gt;&#10;
+      &lt;!-- ==================================================================================================================== --&gt;&#10;
+      &lt;!-- Example configuration :                                                                                                                                                                                                                               --&gt;&#10;
+      &lt;!--    &lt;alert  metric1=&quot;value1&quot;  metric2=&quot;value2&quot;  ...  metricN=&quot;valueN&quot; /&gt;                                                                                                                                                   --&gt;&#10;
+      &lt;!--    &lt;default  metric1=&quot;value1&quot;  metric2=&quot;value2&quot;  ...  metricN=&quot;valueN&quot; /&gt;                                                                                                                                               --&gt;&#10;
+      &lt;!--    &lt;matching  ioa=&quot;integer&quot;  metric1=&quot;value1&quot;  metric2=&quot;value2&quot;  ...  metricN=&quot;valueN&quot; /&gt;                                                                                                                   --&gt;&#10;
+      &lt;!-- ==================================================================================================================== --&gt;&#10;&lt;/config&gt;"
 			description="XML configuration for messages enrichment|TextArea">
 		</AD>
 		

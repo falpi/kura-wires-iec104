@@ -43,7 +43,11 @@ public class Iec104Configuration {
 	public final Boolean GenInt;
 	public final Boolean InfoAlert;
 	public final Boolean ErrorAlert;
-	public final Map<Integer,Object> Enrichment;
+	
+	// Variabili di configurazione per l'enrichment
+	public Map<String,TypedValue<?>> AlertEnrichment;
+	public Map<String,TypedValue<?>> DefaultEnrichment;
+	public Map<Integer,Map<String,TypedValue<?>>> MatchingEnrichment;
     
     // #########################################################################################################
     // Proprietà private 
@@ -67,9 +71,13 @@ public class Iec104Configuration {
 	// Costanti private 
 	private static final String StrSchemaPath = "/assets/enrichmentSchema.xsd"; 
 	
+	// Definisce gli elementi XML attesi per le tipologie di mapping valide
+	private static final List<String> ArrEnrichmentTypes = 
+			Arrays.asList(new String[]{"alert","default","matching"});
+	
 	// Definisce le metriche riservate non usabili per l'enrichment
 	private static final List<String> ArrReservedMetrics = 
-			Arrays.asList(new String[]{"id","host","port","type","test","cot","oa","ca","val","qual","time"});
+			Arrays.asList(new String[]{"id","host","port","event","message","type","test","cot","oa","ca","ioa","val","qual","time"});
     
     // #########################################################################################################
     // Costruttore della classe
@@ -96,7 +104,7 @@ public class Iec104Configuration {
     	ArrayList<XmlError> ArrValidationErrors;
     	Map<String, TypedValue<?>> ObjWireValues;
     	
-    	// Inizializza parametri semplici
+    	// Inizializza parametri 
         this.Enabled = (Boolean)properties.get(IEC104_ENABLED_PROP_NAME);
         this.DeviceId = (String)properties.get(IEC104_DEVICE_PROP_NAME);
         this.Host = (String)properties.get(IEC104_HOST_PROP_NAME);
@@ -106,7 +114,10 @@ public class Iec104Configuration {
         this.GenInt = (Boolean)properties.get(IEC104_GENINT_PROP_NAME);
         this.InfoAlert = (Boolean)properties.get(IEC104_INFO_ALERT_PROP_NAME);
         this.ErrorAlert = (Boolean)properties.get(IEC104_ERROR_ALERT_PROP_NAME);
-        this.Enrichment = new HashMap<>();
+        
+        this.AlertEnrichment = new HashMap<>();
+        this.DefaultEnrichment = new HashMap<>();
+        this.MatchingEnrichment = new HashMap<>();
         
         // =========================================================================================================
         // Gestione dell'enrichment
@@ -153,7 +164,7 @@ public class Iec104Configuration {
 			        
 			        	ObjConfigItem = ObjConfigItems.item(IntIndex);
 			        	
-			        	if (ObjConfigItem.getNodeName()=="item") {	
+			        	if (ArrEnrichmentTypes.contains(ObjConfigItem.getNodeName())) {	
 			        		
 			        		IntIOA = 0;
 			        		ObjWireValues = new HashMap<>();
@@ -164,7 +175,7 @@ public class Iec104Configuration {
 			        			
 			        			ObjAttribute = ObjAttributes.item(IntAttr);
 			        			
-			        			if (ObjAttribute.getNodeName()=="ioa") {
+			        			if ((ObjConfigItem.getNodeName()=="matching")&&(ObjAttribute.getNodeName()=="ioa")) {
 			        			   IntIOA = Integer.parseInt(ObjAttribute.getNodeValue());
 			        			} else if (!ArrReservedMetrics.contains(ObjAttribute.getNodeName())) {
 			        			   ObjWireValues.put(ObjAttribute.getNodeName(),
@@ -176,7 +187,12 @@ public class Iec104Configuration {
 			               	
 				            // Se c'è almeno una metrica aggiuntiva crea il mapping per lo IOA
 			        		if (ObjWireValues.size()>0) {
-				     	       this.Enrichment.put(IntIOA,ObjWireValues);	  
+			        			switch (ObjConfigItem.getNodeName()) {
+			        			   case "alert": this.AlertEnrichment = ObjWireValues; break;
+			        			   case "default": this.DefaultEnrichment = ObjWireValues; break;
+			        			   case "matching": this.MatchingEnrichment.put(IntIOA,ObjWireValues); break;
+			        			}
+				     	      	  
 			        		}
 			        	}	     	    
 			        }

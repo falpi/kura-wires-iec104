@@ -407,8 +407,13 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
 			// Verifica se lo IOA è matchato da una regola di enrichment
             BolIOA = this.actualConfiguration.MatchingEnrichment.containsKey(IntIOA);
             
-            // Se l'IOA matcha o se non è attivo il filtro sull'enrichment prosegue            
-            if (BolIOA||!this.actualConfiguration.EnrichmentFilter) {
+            // Se l'IOA non matcha ed è attivo il filtro sull'enrichment esegue, altrimenti procede            
+            if (!BolIOA&&this.actualConfiguration.EnrichmentFilter) {
+        	    
+            	// Esegue logging
+            	logger.info("Discarded ASDU [tcp://"+this.actualConfiguration.Host+":"+this.actualConfiguration.Port+"/IOA="+String.valueOf(IntIOA)+"]");
+            
+            } else {
 	            	
 				// Inizializza un nuovo wirerecord con le proprietà comuni
 				ObjWireValues = new HashMap<>();

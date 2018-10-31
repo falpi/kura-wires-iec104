@@ -363,9 +363,11 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
     	
     	// Variabili locali
     	int IntIOA;
+    	boolean BolIOA;
     	List<WireRecord> ObjWireRecords;
-    	Map<String, TypedValue<?>> ObjWireValues;
     	InformationObject[] ObjInformationObjects;	
+    	Map<String, TypedValue<?>> ObjWireValues;
+    	Map<String, TypedValue<?>> ObjCommonValues;
     	
 	    // Esegue logging
     	logger.info("Received ASDU [tcp://"+this.actualConfiguration.Host+":"+this.actualConfiguration.Port+"]");
@@ -379,54 +381,67 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
            return;
     	}
 		
-    	// Prepara le proprietà di testata dell'ASDU
-    	ObjWireValues = new HashMap<>();	
+    	// Prepara le proprietà di testata dell'ASDU condivise da tutti gli information objects
+    	ObjCommonValues = new HashMap<>();	
     	
-    	ObjWireValues.put("id", TypedValues.newStringValue(this.actualConfiguration.DeviceId));
-    	ObjWireValues.put("host", TypedValues.newStringValue(this.actualConfiguration.Host));
-    	ObjWireValues.put("port", TypedValues.newIntegerValue(this.actualConfiguration.Port));
-    	ObjWireValues.put("event", TypedValues.newStringValue("DATA"));
+    	ObjCommonValues.put("id", TypedValues.newStringValue(this.actualConfiguration.DeviceId));
+    	ObjCommonValues.put("host", TypedValues.newStringValue(this.actualConfiguration.Host));
+    	ObjCommonValues.put("port", TypedValues.newIntegerValue(this.actualConfiguration.Port));
+    	ObjCommonValues.put("event", TypedValues.newStringValue("DATA"));
 		
-		ObjWireValues.put("type", TypedValues.newStringValue(ObjASDU.getTypeIdentification().name()));
-		ObjWireValues.put("test", TypedValues.newStringValue(ObjASDU.isTestFrame()?("y"):("n")));
-		ObjWireValues.put("cot", TypedValues.newStringValue(ObjASDU.getCauseOfTransmission().name()));
-		ObjWireValues.put("oa", TypedValues.newIntegerValue(ObjASDU.getOriginatorAddress()));
-		ObjWireValues.put("ca", TypedValues.newIntegerValue(ObjASDU.getCommonAddress()));
+    	ObjCommonValues.put("type", TypedValues.newStringValue(ObjASDU.getTypeIdentification().name()));
+    	ObjCommonValues.put("test", TypedValues.newStringValue(ObjASDU.isTestFrame()?("y"):("n")));
+    	ObjCommonValues.put("cot", TypedValues.newStringValue(ObjASDU.getCauseOfTransmission().name()));
+    	ObjCommonValues.put("oa", TypedValues.newIntegerValue(ObjASDU.getOriginatorAddress()));
+    	ObjCommonValues.put("ca", TypedValues.newIntegerValue(ObjASDU.getCommonAddress()));
 		
 		// Crea un wirerecord per ciascun oggetto
 		ObjWireRecords = new ArrayList<>();
     	
 		// Ciclo di scansione di tutti gli information object
 		for (InformationObject ObjInformationObject : ObjInformationObjects) {
-			
+
 			// Aggiorna lo IOA condiviso da tutti gli information element
 			IntIOA = ObjInformationObject.getInformationObjectAddress();
-			ObjWireValues.put("ioa", TypedValues.newIntegerValue(IntIOA));
 			
-			// Se l'IOA matcha con regola di enrichment aggiunge metriche, altrimenti aggiunge quelle di default
-			if (this.actualConfiguration.MatchingEnrichment.containsKey(IntIOA)) {
-				ObjWireValues.putAll(this.actualConfiguration.MatchingEnrichment.get(IntIOA));	
-			} else if (this.actualConfiguration.DefaultEnrichment.size()>0) {
-				ObjWireValues.putAll(this.actualConfiguration.DefaultEnrichment);
-			}
-
-			// Ciclo di scansione di tutti gli information element
-			for (InformationElement[] ObjInformationElementSet : ObjInformationObject.getInformationElements()) {
-                
-				// Decodifica l'information element in base al tipo di ASDU e aggiunge record alla lista
-				try {
-				   Iec104Decoder.decode(ObjASDU.getTypeIdentification(), ObjInformationElementSet, ObjWireValues);
-				   ObjWireRecords.add(new WireRecord(ObjWireValues)); 
-				} 
-				catch (Exception e) {					
-					notifyAlert(Alert.ERROR_ALERT,"Received ASDU cannot be decoded. Reason: "+e.getMessage());
-				}				
-            }		
+			// Verifica se lo IOA è matchato da una regola di enrichment
+            BolIOA = this.actualConfiguration.MatchingEnrichment.containsKey(IntIOA);
+            
+            // Se l'IOA matcha o se non è attivo il filtro sull'enrichment prosegue            
+            if (BolIOA||!this.actualConfiguration.EnrichmentFilter) {
+	            	
+				// Inizializza un nuovo wirerecord con le proprietà comuni
+				ObjWireValues = new HashMap<>();
+				ObjWireValues.putAll(ObjCommonValues);
+				
+				ObjWireValues.put("ioa", TypedValues.newIntegerValue(IntIOA));
+				
+				// Se l'IOA matcha con regola di enrichment aggiunge metriche, altrimenti aggiunge quelle di default
+				if (BolIOA) {
+					ObjWireValues.putAll(this.actualConfiguration.MatchingEnrichment.get(IntIOA));	
+				} else if (this.actualConfiguration.DefaultEnrichment.size()>0) {
+					ObjWireValues.putAll(this.actualConfiguration.DefaultEnrichment);
+				}
+	
+				// Ciclo di scansione di tutti gli information element
+				for (InformationElement[] ObjInformationElementSet : ObjInformationObject.getInformationElements()) {
+	                
+					// Decodifica l'information element in base al tipo di ASDU e aggiunge record alla lista
+					try {
+					   Iec104Decoder.decode(ObjASDU.getTypeIdentification(), ObjInformationElementSet, ObjWireValues);
+					   ObjWireRecords.add(new WireRecord(ObjWireValues)); 
+					} 
+					catch (Exception e) {					
+						notifyAlert(Alert.ERROR_ALERT,"Received ASDU cannot be decoded. Reason: "+e.getMessage());
+					}				
+	            }	
+            }
 		}
 		
-		// Trasmette i wirerecord ai receiver
-		wireSupport.emit(ObjWireRecords);
-
+		// Se ci sono record da trasmettere procede
+		if (ObjWireRecords.size()>0) {
+		   this.wireSupport.emit(ObjWireRecords);
+		}
     }
 
     @Override

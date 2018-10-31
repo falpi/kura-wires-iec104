@@ -89,7 +89,17 @@
 			default="true"
 			description="Enable malfunction alerts">
 		</AD>
-		
+      
+        <AD
+			id="iec104.enrichment-filter"
+			name="iec104.enrichment-filter"
+			type="Boolean"
+			cardinality="1"
+			required="true"
+			default="false"
+			description="Exclude data messages not matched by enrichment rules">
+		</AD>	
+      
         <AD
 			id="iec104.enrichment"
 			name="iec104.enrichment"
@@ -110,7 +120,7 @@
       &lt;!--    &lt;default  metric1=&quot;value1&quot;  metric2=&quot;value2&quot;  ...  metricN=&quot;valueN&quot; /&gt;                                                                                                                                               --&gt;&#10;
       &lt;!--    &lt;matching  ioa=&quot;integer&quot;  metric1=&quot;value1&quot;  metric2=&quot;value2&quot;  ...  metricN=&quot;valueN&quot; /&gt;                                                                                                                   --&gt;&#10;
       &lt;!-- ==================================================================================================================== --&gt;&#10;&lt;/config&gt;"
-			description="XML configuration for messages enrichment|TextArea">
+			description="XML configuration for messages enrichment rules|TextArea">
 		</AD>
 		
 	</OCD>

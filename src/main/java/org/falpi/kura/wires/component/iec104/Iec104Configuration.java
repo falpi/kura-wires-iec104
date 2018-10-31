@@ -43,6 +43,7 @@ public class Iec104Configuration {
 	public final Boolean GenInt;
 	public final Boolean InfoAlert;
 	public final Boolean ErrorAlert;
+	public final Boolean EnrichmentFilter;
 	
 	// Variabili di configurazione per l'enrichment
 	public Map<String,TypedValue<?>> AlertEnrichment;
@@ -64,6 +65,7 @@ public class Iec104Configuration {
 	private static final String IEC104_INFO_ALERT_PROP_NAME = "iec104.info-alert";
 	private static final String IEC104_ERROR_ALERT_PROP_NAME = "iec104.error-alert";
 	private static final String IEC104_ENRICHMENT_PROP_NAME = "iec104.enrichment";
+	private static final String IEC104_ENRICHMENT_FILTER_PROP_NAME = "iec104.enrichment-filter";
 	
 	// Referenzia il logger della classe principale
 	private static final Logger logger = LoggerFactory.getLogger(Iec104Subscriber.class);
@@ -114,7 +116,8 @@ public class Iec104Configuration {
         this.GenInt = (Boolean)properties.get(IEC104_GENINT_PROP_NAME);
         this.InfoAlert = (Boolean)properties.get(IEC104_INFO_ALERT_PROP_NAME);
         this.ErrorAlert = (Boolean)properties.get(IEC104_ERROR_ALERT_PROP_NAME);
-        
+        this.EnrichmentFilter = (Boolean)properties.get(IEC104_ENRICHMENT_FILTER_PROP_NAME);
+       
         this.AlertEnrichment = new HashMap<>();
         this.DefaultEnrichment = new HashMap<>();
         this.MatchingEnrichment = new HashMap<>();

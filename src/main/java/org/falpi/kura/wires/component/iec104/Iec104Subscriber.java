@@ -411,7 +411,7 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
             if (!BolIOA&&this.actualConfiguration.EnrichmentFilter) {
         	    
             	// Esegue logging
-            	logger.info("Discarded ASDU [tcp://"+this.actualConfiguration.Host+":"+this.actualConfiguration.Port+"/IOA="+String.valueOf(IntIOA)+"]");
+            	logger.debug("Discarded ASDU [tcp://"+this.actualConfiguration.Host+":"+this.actualConfiguration.Port+"/IOA="+String.valueOf(IntIOA)+"]");
             
             } else {
 	            	

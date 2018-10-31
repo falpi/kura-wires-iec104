@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [1.2.0] - under development
+## [1.2.0] - 2018-10-31
 ### Added
 - Enrichment filter parameter.  
   Now it's possible to enable filtering based on "matching" items in enrichment rules.  

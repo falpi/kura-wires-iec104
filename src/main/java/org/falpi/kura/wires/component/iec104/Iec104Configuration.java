@@ -30,7 +30,10 @@ public class Iec104Configuration {
     // #########################################################################################################
     // Proprietà pubbliche
     // #########################################################################################################
-	
+
+	// Stato di validità dell'enrichment
+	public Boolean EnrichmentError = false;
+
 	// Variabili di configurazione (alterabile per riflettere lo stato dinamico del componente)
 	public Boolean Enabled;
 	
@@ -79,7 +82,7 @@ public class Iec104Configuration {
 	
 	// Definisce le metriche riservate non usabili per l'enrichment
 	private static final List<String> ArrReservedMetrics = 
-			Arrays.asList(new String[]{"id","host","port","event","message","type","test","cot","oa","ca","ioa","val","qual","time"});
+			Arrays.asList(new String[]{"id","host","port","event","eventId","message","type","test","cot","oa","ca","ioa","val","qual","time"});
     
     // #########################################################################################################
     // Costruttore della classe
@@ -202,8 +205,8 @@ public class Iec104Configuration {
 		        }
 	        }
 	        catch (Exception e) {
+	        	EnrichmentError = true;
 	        	logger.error("Error during enrichment preparation. Reason: "+e.getMessage());
-	 	        return;
 	        }
         }
         

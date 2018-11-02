@@ -1,6 +1,17 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2018-11-2
+### Added
+- Additional metric "eventId" with numeric identifier of event type is  
+  added to every message. The decoding is described on README.  
+  
+- Generate ERROR alert if enrichment configuration is invalid.  
+  This not prevent subscribing and publishing of data but could lead to  
+  invalid messages and/or data losses if filtering is enabled or some  
+  some logic is implemented on additional enriched metrics.  
+  Validation error are registered in logs.  
+
 ## [1.2.0] - 2018-10-31
 ### Added
 - Enrichment filter parameter.  

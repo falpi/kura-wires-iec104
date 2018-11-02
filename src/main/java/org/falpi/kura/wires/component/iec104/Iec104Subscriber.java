@@ -35,16 +35,17 @@ import org.openmuc.j60870.IeQualifierOfInterrogation;
 
 public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, ConnectionEventListener, Runnable {
 
-	private enum Alert {
+	private enum Event {
 		
-		ERROR_ALERT(0,"ERROR"),
-		CONNECT_ALERT(1,"CONNECT"),
-	    DISCONNECT_ALERT(2,"DISCONNECT");
+		DATA_EVENT(0,"DATA"),
+		ERROR_EVENT(1,"ERROR"),
+		CONNECT_EVENT(2,"CONNECT"),
+	    DISCONNECT_EVENT(3,"DISCONNECT");
 		
 	    public final int id;
 	    public final String description;
 	    
-		private Alert(int id, String description) {
+		private Event(int id, String description) {
 	        this.id = id;
 	        this.description = description;
 	    }
@@ -87,7 +88,7 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
 		// Prepara la nuova configurazione attesa
         this.actualConfiguration = new Iec104Configuration(properties);
         this.desiredConfiguration = this.actualConfiguration;
-        
+                
 		// Schedula il thread di controllo della connessione 
         this.scheduledWorker = Executors.newSingleThreadScheduledExecutor();    	 
 		this.scheduledHandle = this.scheduledWorker.scheduleAtFixedRate(this,1,this.actualConfiguration.Delay,TimeUnit.SECONDS);
@@ -160,7 +161,7 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
 
     	// Se è già connesso genera eccezione
         if (isConnected()) {
-        	notifyAlert(Alert.ERROR_ALERT,"Connect failed. Reason: already connected");
+        	notifyAlert(Event.ERROR_EVENT,"Connect failed. Reason: already connected");
         	return;
         }
                 
@@ -169,7 +170,7 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
             hostAddress = InetAddress.getByName(this.actualConfiguration.Host);   
             
         } catch (UnknownHostException e) {
-        	notifyAlert(Alert.ERROR_ALERT,"Connect failed. Reason: unknown host ("+this.actualConfiguration.Host+")");
+        	notifyAlert(Event.ERROR_EVENT,"Connect failed. Reason: unknown host ("+this.actualConfiguration.Host+")");
         	return;
         }          
 
@@ -179,7 +180,7 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
         	this.serverConnection = connectionBuilder.connect();     
         	
         } catch (IOException e) {     
-        	notifyAlert(Alert.ERROR_ALERT,"Connect failed. Reason: "+e.getMessage());
+        	notifyAlert(Event.ERROR_EVENT,"Connect failed. Reason: "+e.getMessage());
         	return;
         }
         
@@ -192,7 +193,7 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
         	this.serverConnection.close();
         	this.serverConnection = null;
         	
-        	notifyAlert(Alert.ERROR_ALERT,"Connect failed. Reason: starting data transfer timed out");
+        	notifyAlert(Event.ERROR_EVENT,"Connect failed. Reason: starting data transfer timed out");
         	return;
             
         } catch (IOException e) {      
@@ -200,12 +201,12 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
         	this.serverConnection.close();
         	this.serverConnection = null;
         	
-        	notifyAlert(Alert.ERROR_ALERT,"Connect failed. Reason: "+e.getMessage());
+        	notifyAlert(Event.ERROR_EVENT,"Connect failed. Reason: "+e.getMessage());
         	return;
         }
         
         // Genera evento
-        notifyAlert(Alert.CONNECT_ALERT,"Connecting... Done");
+        notifyAlert(Event.CONNECT_EVENT,"Connecting... Done");
 		
         // Se richiesto inoltra una general interrogation
         if (this.actualConfiguration.GenInt) {
@@ -221,7 +222,7 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
 
     	// Se non è connesso genera eccezione
         if (!isConnected()) {
-        	notifyAlert(Alert.ERROR_ALERT,"General interrogation failed. Reason: not connected");
+        	notifyAlert(Event.ERROR_EVENT,"General interrogation failed. Reason: not connected");
         	return;
         }
        
@@ -231,7 +232,7 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
         			                            CauseOfTransmission.ACTIVATION,
                                                 new IeQualifierOfInterrogation(20));        	
         } catch (IOException e) {
-        	notifyAlert(Alert.ERROR_ALERT,"General interrogation failed. Reason: "+e.getMessage());	
+        	notifyAlert(Event.ERROR_EVENT,"General interrogation failed. Reason: "+e.getMessage());	
         	return;
         } 
         
@@ -258,39 +259,41 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
         }
         
         // Genera evento
-        notifyAlert(Alert.DISCONNECT_ALERT,"Disconnecting... Done");
+        notifyAlert(Event.DISCONNECT_EVENT,"Disconnecting... Done");
         
         // Resetta l'handler di connessione e la configurazione
         this.serverConnection = null;
    }
 	
 	// Genera evento di notifica
-    private synchronized void notifyAlert(Alert AlertId,String StrMessage) {
+    private synchronized void notifyAlert(Event ObjEvent,String StrMessage) {
     	
     	// Variabili locali
     	List<WireRecord> ObjWireRecords;
     	Map<String, TypedValue<?>> ObjWireValues;
 		
 		// Manda il messaggio in log con il giusto livello di severity
-		switch (AlertId) {		
-		   case ERROR_ALERT: logger.error(StrMessage); break;
-		   case CONNECT_ALERT: logger.info(StrMessage); break;
-		   case DISCONNECT_ALERT: logger.warn(StrMessage); break;
+		switch (ObjEvent) {		
+		   case DATA_EVENT: return;
+		   case ERROR_EVENT: logger.error(StrMessage); break;
+		   case CONNECT_EVENT: logger.info(StrMessage); break;
+		   case DISCONNECT_EVENT: logger.warn(StrMessage); break;
 		}
 
 		// Se la notifica dell'alert non è disabilitata emette wire record
-		if (((AlertId!=Alert.ERROR_ALERT)&&(this.actualConfiguration.InfoAlert))||
-			((AlertId==Alert.ERROR_ALERT)&&(this.actualConfiguration.ErrorAlert))) {
+		if (((ObjEvent!=Event.ERROR_EVENT)&&(this.actualConfiguration.InfoAlert))||
+			((ObjEvent==Event.ERROR_EVENT)&&(this.actualConfiguration.ErrorAlert))) {
 			
 	     	// Prepara le proprietà dell'evento
 	    	ObjWireValues = new HashMap<>();			
 	    	ObjWireValues.put("id", TypedValues.newStringValue(this.actualConfiguration.DeviceId));
 	    	ObjWireValues.put("host", TypedValues.newStringValue(this.actualConfiguration.Host));
 	    	ObjWireValues.put("port", TypedValues.newIntegerValue(this.actualConfiguration.Port));
-	    	ObjWireValues.put("event", TypedValues.newStringValue(AlertId.description));
+	    	ObjWireValues.put("eventId", TypedValues.newIntegerValue(ObjEvent.id));
+	    	ObjWireValues.put("event", TypedValues.newStringValue(ObjEvent.description));
 			
 			// Se si tratta di alert di errore ed è stato fornito un messaggio lo aggiunge al record
-			if ((StrMessage!="")&&(AlertId==Alert.ERROR_ALERT)) {
+			if ((StrMessage!="")&&(ObjEvent==Event.ERROR_EVENT)) {
 				ObjWireValues.put("message", TypedValues.newStringValue(StrMessage));
 			}
 			
@@ -319,14 +322,6 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
 
 	   // Se la configurazione è cambiata esegue
        if (!this.actualConfiguration.equals(this.desiredConfiguration)) {
- 		  
-    	  // Se è connesso e c'è un cambio dei parametri di base si disconnette
- 	      if (isConnected()&&
- 	    	  ((!this.actualConfiguration.Host.equals(this.desiredConfiguration.Host))||
- 	    	   (!this.actualConfiguration.Port.equals(this.desiredConfiguration.Port))||
- 	    	   (!this.actualConfiguration.CommonAddr.equals(this.desiredConfiguration.CommonAddr)))) {
- 	         disconnect();
- 	      }
  	      
 		  // Se c'è stato un cambio del delay di riconnessione cambia lo scheduling
 	      if (!this.actualConfiguration.Delay.equals(this.desiredConfiguration.Delay)) {
@@ -337,6 +332,21 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
 	   	      this.scheduledHandle = this.scheduledWorker.scheduleAtFixedRate(this,this.desiredConfiguration.Delay,this.desiredConfiguration.Delay,TimeUnit.SECONDS);
 	   	      
 	   	      logger.info("Changing reconnect delay... Done");
+ 	      }	      
+ 		  
+    	  // Se è connesso esegue
+	      if (isConnected()) {
+	    	  
+	    	 // Se sono cambiati i parametri del server si disconnette 
+	    	 if ((!this.actualConfiguration.Host.equals(this.desiredConfiguration.Host))||
+ 	    	     (!this.actualConfiguration.Port.equals(this.desiredConfiguration.Port))||
+ 	    	     (!this.actualConfiguration.CommonAddr.equals(this.desiredConfiguration.CommonAddr))) {
+ 	            disconnect();
+ 	    	 } 
+	    	 // Altrimenti se c'è un errore nell'enrichment genera evento di errore
+	    	 else if (this.actualConfiguration.EnrichmentError) {
+ 	    		 notifyAlert(Event.ERROR_EVENT,"Invalid enrichment configuration. Could cause invalid messages and/or data losses.");
+ 	    	 }
  	      }
 	   }
        
@@ -345,11 +355,20 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
               
        // Se è non connesso e deve connettersi esegue
        if (!isConnected()&&(this.actualConfiguration.Enabled==true)) {		
+    	   
+    	  // Attua connessione
           connect();
+	    
+          // Altrimenti se c'è un errore nell'enrichment genera evento di errore
+	      if (this.actualConfiguration.EnrichmentError) {
+	         notifyAlert(Event.ERROR_EVENT,"Invalid enrichment configuration. Could cause invalid messages and/or data losses.");
+	      }
        } 
 			
        // Se è connesso e deve disconnettersi esegue
-       if (isConnected()&&(this.actualConfiguration.Enabled==false)) {		
+       if (isConnected()&&(this.actualConfiguration.Enabled==false)) {	
+    	   
+    	  // Attua disconnessione
           disconnect();
        } 
     }
@@ -377,7 +396,7 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
     	
     	// Se l'ASDU non contiene oggetti genera warning ed esce
     	if ((ObjInformationObjects==null)||(ObjInformationObjects.length==0)) {    		
-    	   notifyAlert(Alert.ERROR_ALERT,"Received ASDU cannot be decoded. Reason: empty");
+    	   notifyAlert(Event.ERROR_EVENT,"Received ASDU cannot be decoded. Reason: empty");
            return;
     	}
 		
@@ -387,7 +406,8 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
     	ObjCommonValues.put("id", TypedValues.newStringValue(this.actualConfiguration.DeviceId));
     	ObjCommonValues.put("host", TypedValues.newStringValue(this.actualConfiguration.Host));
     	ObjCommonValues.put("port", TypedValues.newIntegerValue(this.actualConfiguration.Port));
-    	ObjCommonValues.put("event", TypedValues.newStringValue("DATA"));
+    	ObjCommonValues.put("eventId", TypedValues.newIntegerValue(Event.DATA_EVENT.id));
+    	ObjCommonValues.put("event", TypedValues.newStringValue(Event.DATA_EVENT.description));
 		
     	ObjCommonValues.put("type", TypedValues.newStringValue(ObjASDU.getTypeIdentification().name()));
     	ObjCommonValues.put("test", TypedValues.newStringValue(ObjASDU.isTestFrame()?("y"):("n")));
@@ -437,7 +457,7 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
 					   ObjWireRecords.add(new WireRecord(ObjWireValues)); 
 					} 
 					catch (Exception e) {					
-						notifyAlert(Alert.ERROR_ALERT,"Received ASDU cannot be decoded. Reason: "+e.getMessage());
+						notifyAlert(Event.ERROR_EVENT,"Received ASDU cannot be decoded. Reason: "+e.getMessage());
 					}				
 	            }	
             }
@@ -453,7 +473,7 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
     public void connectionClosed(IOException e) {    	
 		
         // Genera evento
-        notifyAlert(Alert.ERROR_ALERT,"Received Connection Closed Signal. Reason: "+(e.getMessage().isEmpty()?("unknown"):(e.getMessage())));
+        notifyAlert(Event.ERROR_EVENT,"Received Connection Closed Signal. Reason: "+(e.getMessage().isEmpty()?("unknown"):(e.getMessage())));
     	
     	// Se è già connesso (molto probabile!), disconnette
         if (isConnected()) {		

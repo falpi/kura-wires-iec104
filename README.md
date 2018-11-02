@@ -27,7 +27,8 @@ Metric      | Description
 **id**      | Device Id (from static configuration)
 **host**    | IEC-104 Server Host (from static configuration)
 **port**    | IEC-104 Server Port (from static configuration)
-**event**   | Event Type (DATA,CONNECT,DISCONNECT,ERROR) 
+**event**   | Event Type (DATA,ERROR,CONNECT,DISCONNECT) 
+**eventId** | Event Id (0=DATA,1=ERROR,2=CONNECT,3=DISCONNECT) 
 **message** | Event Message (only for alert events, where event<>DATA)
 
 The following additional metric are specific for data messages.

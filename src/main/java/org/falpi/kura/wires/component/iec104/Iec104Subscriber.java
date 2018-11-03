@@ -295,14 +295,15 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
 		  // Se è connesso esegue
 		  if (isConnected()) {
 				  
-				 // Se sono cambiati i parametri del server si disconnette 
+			 // Se sono cambiati i parametri del server si disconnette 
 			 if ((!this.actualConfiguration.Host.equals(this.desiredConfiguration.Host))||
 			     (!this.actualConfiguration.Port.equals(this.desiredConfiguration.Port))||
 			     (!this.actualConfiguration.CommonAddr.equals(this.desiredConfiguration.CommonAddr))) {
 			    disconnect();
 			 } 
-			 // Altrimenti se c'è un errore nell'enrichment genera evento di errore
-			 else if (this.actualConfiguration.EnrichmentError) {
+			 // Altrimenti se c'è un errore nell'enrichment e non c'è richiesta di disconnessione genera alert 
+			 else if ((this.desiredConfiguration.Enabled)&&
+					  (this.actualConfiguration.EnrichmentError)) {
 				 notifyAlert(Event.WARNING_EVENT,"Invalid enrichment configuration. Could cause invalid messages and/or data losses.");
 			 }
 		  }
@@ -359,7 +360,7 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
 	    	ObjWireValues.put("event", TypedValues.newStringValue(ObjEvent.description));
 			
 			// Se si tratta di alert di errore ed è stato fornito un messaggio lo aggiunge al record
-			if ((StrMessage!="")&&(ObjEvent==Event.ERROR_EVENT)) {
+			if (StrMessage!="") {
 				ObjWireValues.put("message", TypedValues.newStringValue(StrMessage));
 			}
 			

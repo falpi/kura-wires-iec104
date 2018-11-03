@@ -44,9 +44,9 @@ public class Iec104Configuration {
 	public final Integer CommonAddr;
 	public final Integer Delay;
 	public final Boolean GenInt;
-	public final Boolean InfoAlert;
-	public final Boolean ErrorAlert;
-	public final Boolean EnrichmentFilter;
+	public final Boolean Alerting;
+	public final Boolean Filtering;
+	public final String Enrichment;
 	
 	// Variabili di configurazione per l'enrichment
 	public Map<String,TypedValue<?>> AlertEnrichment;
@@ -65,10 +65,9 @@ public class Iec104Configuration {
 	private static final String IEC104_COMMON_ADDR_PROP_NAME = "iec104.common-addr";
 	private static final String IEC104_DELAY_PROP_NAME = "iec104.delay";
 	private static final String IEC104_GENINT_PROP_NAME = "iec104.genint";
-	private static final String IEC104_INFO_ALERT_PROP_NAME = "iec104.info-alert";
-	private static final String IEC104_ERROR_ALERT_PROP_NAME = "iec104.error-alert";
+	private static final String IEC104_ALERTING_PROP_NAME = "iec104.alerting";
+	private static final String IEC104_FILTERING_PROP_NAME = "iec104.filtering";
 	private static final String IEC104_ENRICHMENT_PROP_NAME = "iec104.enrichment";
-	private static final String IEC104_ENRICHMENT_FILTER_PROP_NAME = "iec104.enrichment-filter";
 	
 	// Referenzia il logger della classe principale
 	private static final Logger logger = LoggerFactory.getLogger(Iec104Subscriber.class);
@@ -96,7 +95,6 @@ public class Iec104Configuration {
     	
     	String StrValidationErrors;
     	String StrEnrichmentSchema;
-    	String StrEnrichmentConfig;
     	XmlObject ObjEnrichmentSchema;
     	XmlObject ObjEnrichmentConfig;    	
     	
@@ -117,9 +115,8 @@ public class Iec104Configuration {
         this.CommonAddr = (Integer)properties.get(IEC104_COMMON_ADDR_PROP_NAME);
         this.Delay = (Integer)properties.get(IEC104_DELAY_PROP_NAME);
         this.GenInt = (Boolean)properties.get(IEC104_GENINT_PROP_NAME);
-        this.InfoAlert = (Boolean)properties.get(IEC104_INFO_ALERT_PROP_NAME);
-        this.ErrorAlert = (Boolean)properties.get(IEC104_ERROR_ALERT_PROP_NAME);
-        this.EnrichmentFilter = (Boolean)properties.get(IEC104_ENRICHMENT_FILTER_PROP_NAME);
+        this.Alerting = (Boolean)properties.get(IEC104_ALERTING_PROP_NAME);
+        this.Filtering = (Boolean)properties.get(IEC104_FILTERING_PROP_NAME);
        
         this.AlertEnrichment = new HashMap<>();
         this.DefaultEnrichment = new HashMap<>();
@@ -129,10 +126,10 @@ public class Iec104Configuration {
         // Gestione dell'enrichment
         // =========================================================================================================
         
-        StrEnrichmentConfig = (String)properties.get(IEC104_ENRICHMENT_PROP_NAME);
+        this.Enrichment = (String)properties.get(IEC104_ENRICHMENT_PROP_NAME);
         
         // Se è stata fornita una configurazione per l'enrichment la gestisce
-        if (StrEnrichmentConfig!="") {
+        if (this.Enrichment!="") {
         	
         	// Verifica la validità della configurazione e prepara il DOM XML
 	        try {
@@ -143,7 +140,7 @@ public class Iec104Configuration {
 	            ObjEnrichmentSchema = SchemaDocument.Factory.parse(StrEnrichmentSchema);  
 	            
 	            logger.debug("Parsing enrichment config");	
-	            ObjEnrichmentConfig = XmlObject.Factory.parse((String)properties.get(IEC104_ENRICHMENT_PROP_NAME));
+	            ObjEnrichmentConfig = XmlObject.Factory.parse(this.Enrichment);
 	            
 	            logger.debug("Validating enrichment config");	
 	            ArrValidationErrors = XmlUtils.validate(ObjEnrichmentConfig, new XmlObject[] {ObjEnrichmentSchema});
@@ -210,7 +207,34 @@ public class Iec104Configuration {
 	        }
         }
         
-        // =========================================================================================================
-    	 
-    }    
+        // =========================================================================================================    	 
+    }  
+    
+    // #########################################################################################################
+    // Comparatore della classe
+    // #########################################################################################################
+    
+    @Override
+    public boolean equals(Object ObjCompared) {
+          	
+       // Se l'oggetto da comparare è nullo o di un altra classe esce
+       if ((ObjCompared==null)||(ObjCompared.getClass()!=this.getClass())) return false; 
+      
+       // Esegue typecast dell'argomento
+       Iec104Configuration ObjCasted = (Iec104Configuration)ObjCompared;
+       
+       // Verifica uguaglianza tra le proprietà pubbliche
+       return
+          (this.Enabled.equals(ObjCasted.Enabled)&&
+           this.DeviceId.equals(ObjCasted.DeviceId))&&
+           this.Host.equals(ObjCasted.Host)&&
+           this.Port.equals(ObjCasted.Port)&&
+           this.CommonAddr.equals(ObjCasted.CommonAddr)&&
+           this.Delay.equals(ObjCasted.Delay)&&
+           this.GenInt.equals(ObjCasted.GenInt)&&
+           this.Alerting.equals(ObjCasted.Alerting)&&
+           this.Filtering.equals(ObjCasted.Filtering)&&
+           this.Enrichment.equals(ObjCasted.Enrichment);
+    }
+
 }

@@ -27,8 +27,8 @@ Metric      | Description
 **id**      | Device Id (from static configuration)
 **host**    | IEC-104 Server Host (from static configuration)
 **port**    | IEC-104 Server Port (from static configuration)
-**event**   | Event Type (DATA,ERROR,CONNECT,DISCONNECT) 
-**eventId** | Event Id (0=DATA,1=ERROR,2=CONNECT,3=DISCONNECT) 
+**event**   | Event Type (DATA,CONNECT,DISCONNECT,WARNING,ERROR) 
+**eventId** | Event Id (0=DATA,1=CONNECT,2=DISCONNECT,3=WARNING,4=ERROR) 
 **message** | Event Message (only for alert events, where event<>DATA)
 
 The following additional metric are specific for data messages.
@@ -45,12 +45,10 @@ Metric      | Description
 **qual**    | Quality (depend on ASDU type)
 **time**    | Time (depend on ASDU Type)
 
-
 ## Build sources
 The only requisite to build from sources is an already  
 installed Eclipse Kura User Workspace.  
- 
- 
+  
 ## Binary package
 The binary package ready for the installation can be
 found in folder "**resources/dp**".

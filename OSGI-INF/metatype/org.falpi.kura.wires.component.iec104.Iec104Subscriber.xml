@@ -71,28 +71,18 @@
 		</AD>
 		
         <AD
-			id="iec104.info-alert"
-			name="iec104.info-alert"
+			id="iec104.alerting"
+			name="iec104.alerting"
 			type="Boolean"
 			cardinality="1"
 			required="true"
 			default="true"
-			description="Enable information alerts">
+			description="Enable alert messages (eventId&gt;0)">
 		</AD>	
-		
+		      
         <AD
-			id="iec104.error-alert"
-			name="iec104.error-alert"
-			type="Boolean"
-			cardinality="1"
-			required="true"
-			default="true"
-			description="Enable malfunction alerts">
-		</AD>
-      
-        <AD
-			id="iec104.enrichment-filter"
-			name="iec104.enrichment-filter"
+			id="iec104.filtering"
+			name="iec104.filtering"
 			type="Boolean"
 			cardinality="1"
 			required="true"
@@ -106,20 +96,19 @@
 			type="String"
 			cardinality="1"
 			required="false"
-			default="&lt;config&gt;&#10;
-      &lt;!-- ==================================================================================================================== --&gt;&#10;
-      &lt;!-- Enrichment configuration syntax :                                                                                                                                                                                                              --&gt;&#10;
-      &lt;!--    - Add zero or exactly one &lt;alert&gt; element to add metrics to all ALERT messages                                                                      --&gt;&#10;
-      &lt;!--    - Add zero or exactly one &lt;default&gt; element to add metrics to all DATA messages with unmatching IOA                    --&gt;&#10;
-      &lt;!--    - Add zero or more &lt;matching&gt; elements to add metrics to DATA message with matching IOA                                  --&gt;&#10;
-      &lt;!--    - Additional metrics are given as attribute/value pairs in XML elements. The following attribute names are reserved:                                                                     --&gt;&#10;
-      &lt;!--       id | host | port | eventId | event | message | type | test | cot | oa | ca | ioa | val | qual | time                                                                                                                               --&gt;&#10;
-      &lt;!-- ==================================================================================================================== --&gt;&#10;
-      &lt;!-- Example configuration :                                                                                                                                                                                                                               --&gt;&#10;
-      &lt;!--    &lt;alert  metric1=&quot;value1&quot;  metric2=&quot;value2&quot;  ...  metricN=&quot;valueN&quot; /&gt;                                                                                                                                                   --&gt;&#10;
-      &lt;!--    &lt;default  metric1=&quot;value1&quot;  metric2=&quot;value2&quot;  ...  metricN=&quot;valueN&quot; /&gt;                                                                                                                                               --&gt;&#10;
-      &lt;!--    &lt;matching  ioa=&quot;integer&quot;  metric1=&quot;value1&quot;  metric2=&quot;value2&quot;  ...  metricN=&quot;valueN&quot; /&gt;                                                                                                                   --&gt;&#10;
-      &lt;!-- ==================================================================================================================== --&gt;&#10;&lt;/config&gt;"
+			default="&lt;config&gt;&#10;&lt;!-- ========================================================================================&#10;
+      Enrichment configuration syntax:&#10;
+          - Add zero or exactly one &lt;alert&gt; element to add metrics to all ALERT messages&#10;
+          - Add zero or exactly one &lt;default&gt; element to add metrics to all DATA messages with unmatching IOA&#10;
+          - Add zero or more &lt;matching&gt; elements to add metrics to DATA message with matching IOA&#10;
+          - Additional metrics are given as attribute/value pairs in XML elements. The following names are reserved:&#10;
+                id | host | port | eventId | event | message | type | test | cot | oa | ca | ioa | val | qual | time&#10;
+      ========================================================================================&#10;
+      Example configuration:&#10;
+          &lt;alert  metric1=&quot;value1&quot;  metric2=&quot;value2&quot;  ...  metricN=&quot;valueN&quot; /&gt;&#10;
+          &lt;default  metric1=&quot;value1&quot;  metric2=&quot;value2&quot;  ...  metricN=&quot;valueN&quot; /&gt;&#10;
+          &lt;matching  ioa=&quot;integer&quot;  metric1=&quot;value1&quot;  metric2=&quot;value2&quot;  ...  metricN=&quot;valueN&quot; /&gt;&#10;
+      ======================================================================================== --&gt;&#10;&lt;/config&gt;"
 			description="XML configuration for messages enrichment rules|TextArea">
 		</AD>
 		

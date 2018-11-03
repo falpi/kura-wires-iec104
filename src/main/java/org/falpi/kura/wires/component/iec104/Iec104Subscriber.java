@@ -278,8 +278,16 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
    // Gestione aggiornamento configurazione    
    private synchronized void update() {
 			
-	   // Se la configurazione non è cambiata esegue
-	   if (!this.actualConfiguration.equals(this.desiredConfiguration)) {
+	   // Variabili private
+	   Boolean BolUpdated;
+	   Boolean BolConnected;
+
+	   // Salva stato della connessione e verifica se c'è stato un effettivo cambiamento
+	   BolUpdated = !this.actualConfiguration.equals(this.desiredConfiguration);
+	   BolConnected = isConnected();
+	   
+	   // Se la configurazione è cambiata esegue
+	   if (BolUpdated) {
 	      
 		  // Se c'è stato un cambio del delay di riconnessione cambia lo scheduling
 		  if (!this.actualConfiguration.Delay.equals(this.desiredConfiguration.Delay)) {
@@ -292,20 +300,12 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
 			  logger.info("Changing reconnect delay... Done");
 		  }	      
 		  
-		  // Se è connesso esegue
-		  if (isConnected()) {
-				  
-			 // Se sono cambiati i parametri del server si disconnette 
-			 if ((!this.actualConfiguration.Host.equals(this.desiredConfiguration.Host))||
-			     (!this.actualConfiguration.Port.equals(this.desiredConfiguration.Port))||
-			     (!this.actualConfiguration.CommonAddr.equals(this.desiredConfiguration.CommonAddr))) {
-			    disconnect();
-			 } 
-			 // Altrimenti se c'è un errore nell'enrichment e non c'è richiesta di disconnessione genera alert 
-			 else if ((this.desiredConfiguration.Enabled)&&
-					  (this.actualConfiguration.EnrichmentError)) {
-				 notifyAlert(Event.WARNING_EVENT,"Invalid enrichment configuration. Could cause invalid messages and/or data losses.");
-			 }
+		  // Se è connesso e sono cambiati i parametri del server si disconnette
+		  if (isConnected()&&
+			  ((!this.actualConfiguration.Host.equals(this.desiredConfiguration.Host))||
+			   (!this.actualConfiguration.Port.equals(this.desiredConfiguration.Port))||
+			   (!this.actualConfiguration.CommonAddr.equals(this.desiredConfiguration.CommonAddr)))) {
+		     disconnect();
 		  }
 	   }
 	   
@@ -314,22 +314,21 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
 	          
 	   // Se è non connesso e deve connettersi esegue
 	   if (!isConnected()&&(this.actualConfiguration.Enabled==true)) {		
-			   
-		  // Attua connessione
 		  connect();
-		
-		  // Se è riuscito a connettersi e c'è un errore nell'enrichment genera evento
-		  if (isConnected()&&this.actualConfiguration.EnrichmentError) {
-		     notifyAlert(Event.WARNING_EVENT,"Invalid enrichment configuration. Could cause invalid messages and/or data losses.");
-	      }
 	   } 
 			
 	   // Se è connesso e deve disconnettersi esegue
 	   if (isConnected()&&(this.actualConfiguration.Enabled==false)) {	
-		   
-		  // Attua disconnessione
 	      disconnect();
 	   } 
+	   
+	   // Se è connesso, c'è stato un aggiornamento della configurazione o dello stato di connessione
+	   // e c'è un errore nella configurazione di enrichment genera alert di warning.
+	   if (isConnected()&&
+	       (BolUpdated||!BolConnected)&&
+	       (this.actualConfiguration.EnrichmentError)) {
+          notifyAlert(Event.WARNING_EVENT,"Invalid enrichment configuration. Could cause invalid messages and/or data losses.");
+	   }
 	}
 	
 	// Genera evento di notifica

@@ -359,8 +359,8 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
 	    	ObjWireValues.put("eventId", TypedValues.newIntegerValue(ObjEvent.id));
 	    	ObjWireValues.put("event", TypedValues.newStringValue(ObjEvent.description));
 			
-			// Se si tratta di alert di errore ed è stato fornito un messaggio lo aggiunge al record
-			if (StrMessage!="") {
+			// Se si tratta di alert di warning o di errore
+			if ((ObjEvent==Event.WARNING_EVENT)||(ObjEvent==Event.ERROR_EVENT)) {
 				ObjWireValues.put("message", TypedValues.newStringValue(StrMessage));
 			}
 			

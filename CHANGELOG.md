@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] - 2019-01-20
+### Changed
+- New major version 2.x with changes to run with Kura 4.0.0 release
+  
 ## [1.3.0] - 2018-11-3
 ### Added
 - Additional metric "eventId" with numeric identifier of event type is  

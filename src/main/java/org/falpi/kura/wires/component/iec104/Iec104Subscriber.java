@@ -16,11 +16,17 @@ import java.util.concurrent.TimeoutException;
 import org.eclipse.kura.configuration.ConfigurableComponent;
 import org.eclipse.kura.type.TypedValue;
 import org.eclipse.kura.type.TypedValues;
+import org.eclipse.kura.wire.WireComponent;
 import org.eclipse.kura.wire.WireEmitter;
 import org.eclipse.kura.wire.WireHelperService;
 import org.eclipse.kura.wire.WireRecord;
 import org.eclipse.kura.wire.WireSupport;
+
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.wireadmin.Wire;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.ComponentException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +84,7 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
         }
     }
 	
-	public void activate(final Map<String, Object> properties) throws Exception {
+	public void activate(final ComponentContext componentContext, final Map<String, Object> properties) throws ComponentException {
 		
 	 	// Inizializza nome thread
 	 	Thread.currentThread().setName("Activator");
@@ -87,7 +93,8 @@ public class Iec104Subscriber implements WireEmitter, ConfigurableComponent, Con
     	logger.info("Activating IEC-104 Subscriber...");
    	 
         // Registra helper service
-		this.wireSupport = this.wireHelperService.newWireSupport(this);		
+        this.wireSupport = this.wireHelperService.newWireSupport(
+    	    this,(ServiceReference<WireComponent>) componentContext.getServiceReference());
 
 		// Prepara la nuova configurazione attesa
         this.actualConfiguration = new Iec104Configuration(properties);

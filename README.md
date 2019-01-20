@@ -1,7 +1,7 @@
 # Eclipse Kura Wire component for IEC 60870-5-104
 An Eclipse Kura Wires component to subscribe with an IEC 60870-5-104 Server.  
 It uses J60870 library for IEC protocol stack implementation.  
-Tested with Eclipse Kura 3.2.0.
+Tested with Eclipse Kura 4.0.0.
 
 ## Supported ASDU types
 For the moment the following ASDU types are decoded:  
